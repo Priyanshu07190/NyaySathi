@@ -1,18 +1,17 @@
-import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Scale, Home, MessageCircle, FileText, Users, Settings } from 'lucide-react';
+import { Scale, Home as HomeIcon, MessageCircle, Users, Settings } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
-import { getLanguageContent, supportedLanguages } from '../utils/languages';
+import { getLanguageContent } from '../utils/languages';
 
 export function Header() {
   const location = useLocation();
-  const { currentLanguage, setLanguage } = useLanguageStore();
+  const { currentLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
   
   const navItems = [
-    { path: '/', icon: Home, label: content.home },
+    { path: '/', icon: HomeIcon, label: content.home },
     { path: '/conversation', icon: MessageCircle, label: content.chat },
-    { path: '/ngo', icon: Users, label: content.help },
+    { path: '/ngo', icon: Users, label: content.ngoSupport },
     { path: '/admin', icon: Settings, label: content.admin }
   ];
 
@@ -26,8 +25,8 @@ export function Header() {
               <Scale className="h-6 w-6 text-white" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{content.appName}</h1>
-              <p className="text-xs text-gray-500">{content.appSubtitle}</p>
+              <h1 className="text-xl font-bold text-gray-900">{content.appSubtitle}</h1>
+              <p className="text-xs text-gray-500">{content.appName}</p>
             </div>
           </Link>
 
@@ -52,18 +51,7 @@ export function Header() {
             })}
           </nav>
 
-          {/* Language Selector */}
-          <select 
-            value={currentLanguage}
-            onChange={(e) => setLanguage(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            {supportedLanguages.map((lang) => (
-              <option key={lang.code} value={lang.code}>
-                {lang.nativeName}
-              </option>
-            ))}
-          </select>
+          {/* Language selector removed for simplicity */}
         </div>
       </div>
 
@@ -83,7 +71,7 @@ export function Header() {
                 }`}
               >
                 <item.icon className="h-5 w-5" />
-                <span className="text-xs mt-1">{item.labelHi}</span>
+                <span className="text-xs mt-1">{item.label}</span>
               </Link>
             );
           })}

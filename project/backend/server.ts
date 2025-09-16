@@ -4,13 +4,13 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import multer from 'multer';
 
 import conversationRouter from './routes/conversation.js';
 import documentsRouter from './routes/documents.js';
 import ngoRouter from './routes/ngo.js';
 import adminRouter from './routes/admin.js';
 import templatesRouter from './routes/templates.js';
+import audioRouter from './routes/audio.js';
 
 dotenv.config();
 
@@ -33,11 +33,7 @@ app.use(cors({
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// File upload middleware
-const upload = multer({ 
-  dest: 'uploads/',
-  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
-});
+// Note: File uploads for audio use in-memory storage configured in the audio router
 
 // Routes
 app.use('/api/conversation', conversationRouter);
@@ -45,6 +41,7 @@ app.use('/api/documents', documentsRouter);
 app.use('/api/ngo', ngoRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/templates', templatesRouter);
+app.use('/api/audio', audioRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

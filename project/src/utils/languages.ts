@@ -184,9 +184,42 @@ export interface LanguageContent {
   approved: string;
   rejected: string;
   needsRevision: string;
+
+  // Profile/Admin (Profile view)
+  profileTitle: string;
+  profileSubtitle: string;
+  accountDetails: string;
+  fullName: string;
+  namePlaceholder: string;
+  emailLabel: string;
+  emailPlaceholder: string;
+  phoneLabel: string;
+  phonePlaceholder: string;
+  locationLabel: string;
+  locationPlaceholder: string;
+  preferredLanguageLabel: string;
+  voiceAssist: string;
+  notifications: string;
+  saveChanges: string;
+  saved: string;
+  quickInfo: string;
+  languageLabelShort: string;
+  voiceAssistOn: string;
+  voiceAssistOff: string;
+  notificationsOn: string;
+  notificationsOff: string;
+  loadingSessions: string;
+  noSessionData: string;
+  failedToLoadSessions: string;
+  tableSession: string;
+  tableLanguage: string;
+  tableDocType: string;
+  tableStatus: string;
+  tableConfidence: string;
+  tableCreated: string;
 }
 
-export const languages: Record<string, LanguageContent> = {
+export const languages: Record<string, Partial<LanguageContent>> = {
   hi: {
     // Header
     appName: "न्यायसाथी",
@@ -373,6 +406,39 @@ export const languages: Record<string, LanguageContent> = {
     approved: "स्वीकृत",
     rejected: "अस्वीकृत",
     needsRevision: "संशोधन चाहिए"
+    ,
+    // Profile/Admin (Profile view)
+    profileTitle: "प्रोफ़ाइल",
+    profileSubtitle: "अपना खाता और प्राथमिकताएँ प्रबंधित करें",
+    accountDetails: "खाता विवरण",
+    fullName: "पूरा नाम",
+    namePlaceholder: "आपका नाम",
+    emailLabel: "ईमेल",
+    emailPlaceholder: "आपका ईमेल",
+    phoneLabel: "फ़ोन",
+    phonePlaceholder: "+91-",
+    locationLabel: "स्थान",
+    locationPlaceholder: "जिला, राज्य",
+    preferredLanguageLabel: "पसंदीदा भाषा",
+    voiceAssist: "वॉइस असिस्ट",
+    notifications: "सूचनाएँ",
+    saveChanges: "परिवर्तन सहेजें",
+    saved: "सहेजा गया",
+    quickInfo: "त्वरित जानकारी",
+    languageLabelShort: "भाषा",
+    voiceAssistOn: "चालू",
+    voiceAssistOff: "बंद",
+    notificationsOn: "चालू",
+    notificationsOff: "बंद",
+    loadingSessions: "सत्र लोड हो रहे हैं...",
+    noSessionData: "कोई सत्र डेटा उपलब्ध नहीं।",
+    failedToLoadSessions: "हाल के सत्र लोड करने में विफल",
+    tableSession: "सत्र",
+    tableLanguage: "भाषा",
+    tableDocType: "दस्तावेज़ प्रकार",
+    tableStatus: "स्थिति",
+    tableConfidence: "विश्वास",
+    tableCreated: "निर्मित"
   },
   
   en: {
@@ -560,7 +626,40 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "Escalated",
     approved: "Approved",
     rejected: "Rejected",
-    needsRevision: "Needs Revision"
+    needsRevision: "Needs Revision",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "Profile",
+    profileSubtitle: "Manage your account and preferences",
+    accountDetails: "Account Details",
+    fullName: "Full Name",
+    namePlaceholder: "Your name",
+    emailLabel: "Email",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "Phone",
+    phonePlaceholder: "+91-",
+    locationLabel: "Location",
+    locationPlaceholder: "District, State",
+    preferredLanguageLabel: "Preferred Language",
+    voiceAssist: "Voice Assist",
+    notifications: "Notifications",
+    saveChanges: "Save Changes",
+    saved: "Saved",
+    quickInfo: "Quick Info",
+    languageLabelShort: "Language",
+    voiceAssistOn: "On",
+    voiceAssistOff: "Off",
+    notificationsOn: "On",
+    notificationsOff: "Off",
+    loadingSessions: "Loading sessions...",
+    noSessionData: "No session data available.",
+    failedToLoadSessions: "Failed to load recent sessions",
+    tableSession: "Session",
+    tableLanguage: "Language",
+    tableDocType: "Doc Type",
+    tableStatus: "Status",
+    tableConfidence: "Confidence",
+    tableCreated: "Created"
   },
   
   ta: {
@@ -748,7 +847,40 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "அனுப்பப்பட்டது",
     approved: "அங்கீகரிக்கப்பட்டது",
     rejected: "நிராகரிக்கப்பட்டது",
-    needsRevision: "திருத்தம் தேவை"
+    needsRevision: "திருத்தம் தேவை",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "சுயவிவரம்",
+    profileSubtitle: "உங்கள் கணக்கு மற்றும் முன்னுரிமைகளை நிர்வகிக்கவும்",
+    accountDetails: "கணக்கு விவரங்கள்",
+    fullName: "முழு பெயர்",
+    namePlaceholder: "உங்கள் பெயர்",
+    emailLabel: "மின்னஞ்சல்",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "தொலைபேசி",
+    phonePlaceholder: "+91-",
+    locationLabel: "இடம்",
+    locationPlaceholder: "மாவட்டம், மாநிலம்",
+    preferredLanguageLabel: "விருப்ப மொழி",
+    voiceAssist: "குரல் உதவி",
+    notifications: "அறிவிப்புகள்",
+    saveChanges: "மாற்றங்களை சேமிக்கவும்",
+    saved: "சேமிக்கப்பட்டது",
+    quickInfo: "விரைவு தகவல்",
+    languageLabelShort: "மொழி",
+    voiceAssistOn: "ஆன்",
+    voiceAssistOff: "ஆஃப்",
+    notificationsOn: "ஆன்",
+    notificationsOff: "ஆஃப்",
+    loadingSessions: "அமர்வுகள் ஏற்றப்படுகிறது...",
+    noSessionData: "அமர்வு தரவு கிடைக்கவில்லை.",
+    failedToLoadSessions: "சமீபத்திய அமர்வுகளை ஏற்ற முடியவில்லை",
+    tableSession: "அமர்வு",
+    tableLanguage: "மொழி",
+    tableDocType: "ஆவண் வகை",
+    tableStatus: "நிலை",
+    tableConfidence: "நம்பிக்கை",
+    tableCreated: "உருவாக்கப்பட்டது"
   },
   
   te: {
@@ -936,7 +1068,40 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "పంపబడింది",
     approved: "ఆమోదించబడింది",
     rejected: "తిరస్కరించబడింది",
-    needsRevision: "సవరణ అవసరం"
+    needsRevision: "సవరణ అవసరం",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "ప్రొఫైల్",
+    profileSubtitle: "మీ ఖాతా మరియు అభిరుచులను నిర్వహించండి",
+    accountDetails: "ఖాతా వివరాలు",
+    fullName: "పూర్తి పేరు",
+    namePlaceholder: "మీ పేరు",
+    emailLabel: "ఈమెయిల్",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "ఫోన్",
+    phonePlaceholder: "+91-",
+    locationLabel: "ప్రాంతం",
+    locationPlaceholder: "జిల్లా, రాష్ట్రం",
+    preferredLanguageLabel: "ఇష్టమైన భాష",
+    voiceAssist: "వాయిస్ సహాయం",
+    notifications: "ప్రకటనలు",
+    saveChanges: "మార్పులను సేవ్ చేయండి",
+    saved: "సేవ్ అయింది",
+    quickInfo: "త్వరిత సమాచారం",
+    languageLabelShort: "భాష",
+    voiceAssistOn: "ఆన్",
+    voiceAssistOff: "ఆఫ్",
+    notificationsOn: "ఆన్",
+    notificationsOff: "ఆఫ్",
+    loadingSessions: "సెషన్లు లోడ్ అవుతున్నాయి...",
+    noSessionData: "సెషన్ డేటా అందుబాటులో లేదు.",
+    failedToLoadSessions: "ఇటీవలి సెషన్లు లోడ్ చేయడంలో విఫలమైంది",
+    tableSession: "సెషన్",
+    tableLanguage: "భాష",
+    tableDocType: "పత్రం రకం",
+    tableStatus: "స్థితి",
+    tableConfidence: "నమ్మకం",
+    tableCreated: "సృష్టించబడింది"
   },
   
   kn: {
@@ -1124,7 +1289,40 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "ಕಳುಹಿಸಲಾಗಿದೆ",
     approved: "ಅನುಮೋದಿಸಲಾಗಿದೆ",
     rejected: "ತಿರಸ್ಕರಿಸಲಾಗಿದೆ",
-    needsRevision: "ಪರಿಷ್ಕರಣೆ ಅಗತ್ಯ"
+    needsRevision: "ಪರಿಷ್ಕರಣೆ ಅಗತ್ಯ",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "ಪ್ರೊಫೈಲ್",
+    profileSubtitle: "ನಿಮ್ಮ ಖಾತೆ ಮತ್ತು ಆದ್ಯತೆಗಳನ್ನು ನಿರ್ವಹಿಸಿ",
+    accountDetails: "ಖಾತೆ ವಿವರಗಳು",
+    fullName: "ಪೂರ್ಣ ಹೆಸರು",
+    namePlaceholder: "ನಿಮ್ಮ ಹೆಸರು",
+    emailLabel: "ಇಮೇಲ್",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "ಫೋನ್",
+    phonePlaceholder: "+91-",
+    locationLabel: "ಸ್ಥಳ",
+    locationPlaceholder: "ಜಿಲ್ಲೆ, ರಾಜ್ಯ",
+    preferredLanguageLabel: "ಆದ್ಯ ಭಾಷೆ",
+    voiceAssist: "ಧ್ವನಿ ಸಹಾಯಕ",
+    notifications: "ಅಧಿಸೂಚನೆಗಳು",
+    saveChanges: "ಬದಲಾವಣೆಗಳನ್ನು ಉಳಿಸಿ",
+    saved: "ಉಳಿಸಲಾಗಿದೆ",
+    quickInfo: "ತ್ವರಿತ ಮಾಹಿತಿ",
+    languageLabelShort: "ಭಾಷೆ",
+    voiceAssistOn: "ಆನ್",
+    voiceAssistOff: "ಆಫ್",
+    notificationsOn: "ಆನ್",
+    notificationsOff: "ಆಫ್",
+    loadingSessions: "ಅಧಿವೇಶನಗಳು ಲೋಡ್ ಆಗುತ್ತಿವೆ...",
+    noSessionData: "ಸೆಷನ್ ಡೇಟಾ ಲಭ್ಯವಿಲ್ಲ.",
+    failedToLoadSessions: "ಇತ್ತೀಚಿನ ಸೆಷನ್‌ಗಳನ್ನು ಲೋಡ್ ಮಾಡಲು ವಿಫಲವಾಗಿದೆ",
+    tableSession: "ಸೆಷನ್",
+    tableLanguage: "ಭಾಷೆ",
+    tableDocType: "ದಾಖಲೆ ಪ್ರಕಾರ",
+    tableStatus: "ಸ್ಥಿತಿ",
+    tableConfidence: "ವಿಶ್ವಾಸ",
+    tableCreated: "ರಚಿಸಲಾಗಿದೆ"
   },
   
   bn: {
@@ -1312,7 +1510,40 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "পাঠানো হয়েছে",
     approved: "অনুমোদিত",
     rejected: "প্রত্যাখ্যাত",
-    needsRevision: "সংশোধন প্রয়োজন"
+    needsRevision: "সংশোধন প্রয়োজন",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "প্রোফাইল",
+    profileSubtitle: "আপনার অ্যাকাউন্ট ও পছন্দসমূহ পরিচালনা করুন",
+    accountDetails: "অ্যাকাউন্টের বিবরণ",
+    fullName: "পূর্ণ নাম",
+    namePlaceholder: "আপনার নাম",
+    emailLabel: "ইমেইল",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "ফোন",
+    phonePlaceholder: "+91-",
+    locationLabel: "অবস্থান",
+    locationPlaceholder: "জেলা, রাজ্য",
+    preferredLanguageLabel: "পছন্দের ভাষা",
+    voiceAssist: "ভয়েস সহায়তা",
+    notifications: "বিজ্ঞপ্তি",
+    saveChanges: "পরিবর্তন সংরক্ষণ করুন",
+    saved: "সংরক্ষণ করা হয়েছে",
+    quickInfo: "দ্রুত তথ্য",
+    languageLabelShort: "ভাষা",
+    voiceAssistOn: "চালু",
+    voiceAssistOff: "বন্ধ",
+    notificationsOn: "চালু",
+    notificationsOff: "বন্ধ",
+    loadingSessions: "সেশন লোড হচ্ছে...",
+    noSessionData: "কোন সেশন ডেটা পাওয়া যায়নি।",
+    failedToLoadSessions: "সাম্প্রতিক সেশন লোড করা যায়নি",
+    tableSession: "সেশন",
+    tableLanguage: "ভাষা",
+    tableDocType: "ডকুমেন্ট ধরন",
+    tableStatus: "অবস্থা",
+    tableConfidence: "আস্থার মাত্রা",
+    tableCreated: "তৈরি"
   },
   
   gu: {
@@ -1500,12 +1731,48 @@ export const languages: Record<string, LanguageContent> = {
     escalated: "મોકલાયેલ",
     approved: "મંજૂર",
     rejected: "નકારાયેલ",
-    needsRevision: "સુધારાની જરૂર"
+    needsRevision: "સુધારાની જરૂર",
+    
+    // Profile/Admin (Profile view)
+    profileTitle: "પ્રોફાઇલ",
+    profileSubtitle: "તમારા એકાઉન્ટ અને પસંદગીઓ સંચાલિત કરો",
+    accountDetails: "એકાઉન્ટ વિગતો",
+    fullName: "પૂર્ણ નામ",
+    namePlaceholder: "તમારું નામ",
+    emailLabel: "ઇમેઇલ",
+    emailPlaceholder: "you@example.com",
+    phoneLabel: "ફોન",
+    phonePlaceholder: "+91-",
+    locationLabel: "સ્થાન",
+    locationPlaceholder: "જિલ્લો, રાજ્ય",
+    preferredLanguageLabel: "પસંદની ભાષા",
+    voiceAssist: "વૉઇસ સહાય",
+    notifications: "સૂચનાઓ",
+    saveChanges: "ફેરફારો સાચવો",
+    saved: "સાચવાયું",
+    quickInfo: "ઝડપી માહિતી",
+    languageLabelShort: "ભાષા",
+    voiceAssistOn: "ચાલુ",
+    voiceAssistOff: "બંધ",
+    notificationsOn: "ચાલુ",
+    notificationsOff: "બંધ",
+    loadingSessions: "સેશન લોડ થઈ રહ્યા છે...",
+    noSessionData: "સેશન ડેટા ઉપલબ્ધ નથી.",
+    failedToLoadSessions: "તાજેતરના સેશન લોડ કરવામાં નિષ્ફળ",
+    tableSession: "સેશન",
+    tableLanguage: "ભાષા",
+    tableDocType: "દસ્તાવેજ પ્રકાર",
+    tableStatus: "સ્થિતિ",
+    tableConfidence: "વિશ્વાસ",
+    tableCreated: "બનાવેલું"
   }
 };
 
 export function getLanguageContent(languageCode: string): LanguageContent {
-  return languages[languageCode] || languages.en;
+  const en = languages.en as LanguageContent;
+  const selected = languages[languageCode] || {};
+  // Merge selected over English defaults to ensure all keys are present
+  return { ...en, ...selected } as LanguageContent;
 }
 
 export const supportedLanguages = [
