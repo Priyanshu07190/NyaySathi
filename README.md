@@ -2,7 +2,6 @@
 
 <div align="center">
 
-![NyaySathi Logo](https://via.placeholder.com/200x100/4F46E5/FFFFFF?text=NyaySathi)
 
 **Empowering Citizens with AI-Powered Legal Assistance**
 
@@ -678,7 +677,7 @@ This project is dedicated to making legal assistance accessible to everyone, reg
 ## 📞 Contact & Support
 
 ### 👥 **Team**
-- **Lead Developer**: Priyanshu Gupta
+- **Lead Developer**: Priyanshu Bhargav
 - **Project**: NyaySathi (Justice Companion)
 - **GitHub**: https://github.com/Priyanshu07190/NyaySathi
 
