@@ -1,15 +1,31 @@
-import { useState } from 'react';
-import { Mic, MicOff, Send, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Mic, MicOff, Send, FileText, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent } from '../utils/languages';
+import { useVoice } from '../hooks/useVoice';
 
 export function Conversation() {
   const { currentLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
   const [messages, setMessages] = useState<Array<{id: number, text: string, isUser: boolean}>>([]);
   const [inputText, setInputText] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Voice functionality
+  const {
+    isRecording,
+    isSpeaking,
+    isSupported,
+    startRecording,
+    stopRecording,
+    speak,
+    stopSpeaking
+  } = useVoice({
+    language: currentLanguage,
+    onTranscript: (transcript) => {
+      setInputText(transcript);
+    }
+  });
 
   const handleSendMessage = async () => {
     if (!inputText.trim()) return;
@@ -46,6 +62,9 @@ export function Conversation() {
         isUser: false
       };
       setMessages(prev => [...prev, aiResponse]);
+      
+      // Speak the AI response
+      speak(aiResponse.text);
     } catch (error) {
       console.error('Failed to send message:', error);
       const fallbackResponse = {
@@ -54,32 +73,30 @@ export function Conversation() {
         isUser: false
       };
       setMessages(prev => [...prev, fallbackResponse]);
+      
+      // Speak the error message
+      speak(fallbackResponse.text);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const toggleRecording = async () => {
+  const toggleRecording = () => {
+    if (!isSupported) {
+      alert('Voice recognition is not supported in your browser.');
+      return;
+    }
+
     if (!isRecording) {
-      // Start recording
-      try {
-        await navigator.mediaDevices.getUserMedia({ audio: true });
-        setIsRecording(true);
-        // Note: In production, implement proper audio recording and STT
-        // For now, we'll simulate the voice input
-        setTimeout(() => {
-          setIsRecording(false);
-          setInputText(currentLanguage === 'hi' 
-            ? 'मेरा मालिक 3 महीने से सैलरी नहीं दे रहा है' 
-            : 'My employer has not paid salary for 3 months');
-        }, 3000);
-      } catch (error) {
-        console.error('Microphone access denied:', error);
-        alert(content.needHelp);
-      }
+      startRecording();
     } else {
-      // Stop recording
-      setIsRecording(false);
+      stopRecording();
+    }
+  };
+
+  const toggleSpeaking = () => {
+    if (isSpeaking) {
+      stopSpeaking();
     }
   };
 
@@ -176,23 +193,51 @@ export function Conversation() {
           <div className="flex items-center space-x-2">
             <button
               onClick={toggleRecording}
+              disabled={!isSupported}
               className={`p-2 rounded-full transition-colors ${
                 isRecording
-                  ? 'bg-red-600 text-white'
+                  ? 'bg-red-600 text-white animate-pulse'
                   : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              }`}
+              } ${!isSupported ? 'opacity-50 cursor-not-allowed' : ''}`}
+              title={isRecording ? 'Stop recording' : 'Start voice input'}
             >
               {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
             </button>
             
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={content.tellYourProblem}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <button
+              onClick={toggleSpeaking}
+              className={`p-2 rounded-full transition-colors ${
+                isSpeaking
+                  ? 'bg-blue-600 text-white animate-pulse'
+                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              }`}
+              title={isSpeaking ? 'Stop speaking' : 'Voice output enabled'}
+            >
+              {isSpeaking ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+            </button>
+            
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder={isRecording ? 'Listening...' : content.tellYourProblem}
+                className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                  isRecording ? 'bg-red-50 border-red-300' : ''
+                }`}
+                disabled={isRecording}
+              />
+              {isRecording && (
+                <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                  </div>
+                </div>
+              )}
+            </div>
             
             <button
               onClick={handleSendMessage}

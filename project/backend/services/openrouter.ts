@@ -1,13 +1,13 @@
 import OpenAI from 'openai';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 class OpenRouterService {
   private client: OpenAI | null = null;
-  private hasValidApiKey: boolean;
+  private hasValidApiKey: boolean = false;
+  private initialized: boolean = false;
 
-  constructor() {
+  private initialize() {
+    if (this.initialized) return;
+    
     const apiKey = process.env.OPENROUTER_API_KEY;
     this.hasValidApiKey = Boolean(apiKey && apiKey !== 'sk-or-placeholder' && apiKey.length > 10);
     
@@ -23,9 +23,12 @@ class OpenRouterService {
     } else {
       console.warn('OpenRouter API key not configured. AI features will use mock responses.');
     }
+    
+    this.initialized = true;
   }
 
   async generateLegalDocument(prompt: string, context: string, language: string = 'hi'): Promise<any> {
+    this.initialize();
     try {
       if (!this.hasValidApiKey || !this.client) {
         return this.getMockDocumentResponse(prompt, language);
@@ -76,6 +79,7 @@ Context/Templates: ${context}`;
     entities: Record<string, any>;
     confidence: number;
   }> {
+    this.initialize();
     try {
       if (!this.hasValidApiKey || !this.client) {
         return this.getMockIntentResponse(text, language);
@@ -122,6 +126,7 @@ User input (${language}): ${text}`;
   }
 
   async conversationResponse(message: string, language: string = 'hi'): Promise<any> {
+    this.initialize();
     try {
       if (!this.hasValidApiKey || !this.client) {
         return this.getMockConversationResponse(message, language);

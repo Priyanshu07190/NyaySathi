@@ -1,4 +1,5 @@
 import { useParams, Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import { FileText, MessageCircle } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent } from '../utils/languages';
@@ -7,6 +8,7 @@ export function DocumentView() {
   const { documentId } = useParams();
   const { currentLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
+  const [validation, setValidation] = useState<{isValid: boolean; confidence: number; errors: string[]; warnings: string[]; requiredHumanReview: boolean} | null>(null);
 
   // Mock document data - in real app, this would come from API
   const document = {
@@ -17,6 +19,41 @@ export function DocumentView() {
     createdAt: new Date().toLocaleDateString(),
     status: 'Generated'
   };
+
+  useEffect(() => {
+    // Try server-side validation for the current (mock) document
+    // In real flow, you'd fetch the doc by ID then validate it
+    const runValidation = async () => {
+      try {
+        const res = await fetch('/api/documents/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ document: {
+            document_id: document.id,
+            language: currentLanguage,
+            jurisdiction: 'India',
+            document_type: 'rti_request',
+            facts: document.content,
+            parties: { petitioner: { name: 'User', address: '' } },
+            relief_sought: 'Information within 30 days',
+            prayer: 'Please provide requested information',
+            required_docs: [],
+            filing_office: { name: 'Office', address: '', hours: '' },
+            confidence_score: 0.8,
+            template_id: 'rti_request_hi_all',
+            generated_by: 'nyaysathi',
+            timestamp: new Date().toISOString(),
+            plain_language_summary: document.content
+          }})
+        });
+        if (res.ok) {
+          const json = await res.json();
+          setValidation(json);
+        }
+      } catch {}
+    };
+    runValidation();
+  }, [document.id, currentLanguage]);
 
   // Document preview section
   const documentInfo = (
@@ -39,7 +76,31 @@ export function DocumentView() {
       <div className="prose max-w-none bg-white rounded-lg shadow p-6 mb-12">
         <h1 className="text-2xl font-bold mb-4">{document.title}</h1>
         <p className="text-sm text-gray-500 mb-2">{content.documentId} {document.id}</p>
-        <p className="text-sm text-gray-500 mb-6">{content.verificationStatus}: {document.status} · {content.lastUpdated}: {document.createdAt}</p>
+        <p className="text-sm text-gray-500 mb-6">{content.verificationStatus}: {validation ? (validation.isValid ? content.validDocument : content.errorFound) : document.status} · {content.lastUpdated}: {document.createdAt}</p>
+        {validation && (
+          <div className="mb-6 rounded-lg border p-4 bg-gray-50">
+            <div className="text-sm text-gray-700 mb-2">{content.reliable}: {(validation.confidence * 100).toFixed(0)}%</div>
+            {validation.warnings?.length > 0 && (
+              <div className="mb-2">
+                <div className="font-medium text-amber-700">{content.warnings}</div>
+                <ul className="list-disc pl-5 text-sm text-amber-800">
+                  {validation.warnings.map((w, i) => (<li key={i}>{w}</li>))}
+                </ul>
+              </div>
+            )}
+            {validation.errors?.length > 0 && (
+              <div className="mb-2">
+                <div className="font-medium text-red-700">{content.errors}</div>
+                <ul className="list-disc pl-5 text-sm text-red-800">
+                  {validation.errors.map((e, i) => (<li key={i}>{e}</li>))}
+                </ul>
+              </div>
+            )}
+            {validation.requiredHumanReview && (
+              <div className="text-sm text-red-600">{content.humanReviewRequired}</div>
+            )}
+          </div>
+        )}
         <div className="whitespace-pre-wrap text-gray-800 leading-relaxed mb-8">
           {document.content}
         </div>

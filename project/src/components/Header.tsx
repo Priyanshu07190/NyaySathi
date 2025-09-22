@@ -1,12 +1,22 @@
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Scale, Home as HomeIcon, MessageCircle, Users, Settings } from 'lucide-react';
+import { Scale, Home as HomeIcon, MessageCircle, Users, Settings, LogOut, User, Globe } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent } from '../utils/languages';
 
 export function Header() {
   const location = useLocation();
-  const { currentLanguage } = useLanguageStore();
-  const content = getLanguageContent(currentLanguage);
+  const { user, logout, updateLanguage } = useAuth();
+  const { currentLanguage, setLanguage } = useLanguageStore();
+  const content = getLanguageContent(user?.preferences?.language || currentLanguage);
+  
+  // Sync Zustand store with user preference
+  React.useEffect(() => {
+    if (user?.preferences?.language && user.preferences.language !== currentLanguage) {
+      setLanguage(user.preferences.language);
+    }
+  }, [user?.preferences?.language, currentLanguage, setLanguage]);
   
   const navItems = [
     { path: '/', icon: HomeIcon, label: content.home },
@@ -14,6 +24,21 @@ export function Header() {
     { path: '/ngo', icon: Users, label: content.ngoSupport },
     { path: '/admin', icon: Settings, label: content.admin }
   ];
+
+  const handleLanguageChange = async (newLanguage: string) => {
+    try {
+      await updateLanguage(newLanguage);
+      setLanguage(newLanguage);
+    } catch (error) {
+      console.error('Failed to update language:', error);
+      // Still update local state even if API call fails
+      setLanguage(newLanguage);
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header className="bg-white shadow-sm border-b border-blue-100 sticky top-0 z-50">
@@ -51,7 +76,47 @@ export function Header() {
             })}
           </nav>
 
-          {/* Language selector removed for simplicity */}
+          {/* User Menu */}
+          <div className="flex items-center space-x-4">
+            {/* Language Selector */}
+            <div className="relative">
+              <select
+                value={user?.preferences?.language || currentLanguage}
+                onChange={(e) => handleLanguageChange(e.target.value)}
+                className="appearance-none bg-gray-50 border border-gray-200 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="hi">हिंदी</option>
+                <option value="en">English</option>
+                <option value="ta">தமிழ்</option>
+                <option value="te">తెలుగు</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="bn">বাংলা</option>
+                <option value="gu">ગુજરાતી</option>
+              </select>
+              <Globe className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
+            </div>
+
+            {/* User Profile */}
+            <div className="flex items-center space-x-2">
+              <div className="bg-blue-100 p-2 rounded-full">
+                <User className="h-4 w-4 text-blue-600" />
+              </div>
+              <div className="hidden sm:block">
+                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+                <p className="text-xs text-gray-500">{user?.email}</p>
+              </div>
+            </div>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-1 px-3 py-2 text-sm text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+              title="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">लॉग आउट</span>
+            </button>
+          </div>
         </div>
       </div>
 

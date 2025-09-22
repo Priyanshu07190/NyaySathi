@@ -1,6 +1,10 @@
 import express from 'express';
 import { OpenRouterService } from '../services/openrouter.js';
 import { documentGenerator } from '../services/document-generator.js';
+import { documentVerifier } from '../services/verifier.js';
+import { AuthRequest } from '../middleware/auth.js';
+import { DocumentModel } from '../models/Document.js';
+import { v4 as uuidv4 } from 'uuid';
 
 const router = express.Router();
 const openRouter = new OpenRouterService();
@@ -39,8 +43,12 @@ router.get('/templates', async (req, res) => {
 });
 
 // Generate document from conversation
-router.post('/generate', async (req, res) => {
+router.post('/generate', async (req: AuthRequest, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
     const { 
       facts, 
       document_type, 
@@ -59,11 +67,42 @@ router.post('/generate', async (req, res) => {
     // Generate PDF
     const pdfBuffer = documentGenerator.generatePDF(document);
 
+    // Validate the generated document
+    const validation = documentVerifier.verify(document);
+
+    // Save to database
+    const documentRecord = await DocumentModel.create({
+      user_id: req.user.id,
+      document_id: document.document_id,
+      template_id: document.template_id,
+      language,
+      jurisdiction,
+      document_type,
+      facts,
+      parties: document.parties,
+      relief_sought: document.relief_sought,
+      prayer: document.prayer,
+      required_docs: document.required_docs,
+      filing_office: document.filing_office,
+      confidence_score: document.confidence_score,
+      generated_by: document.generated_by,
+      plain_language_summary: document.plain_language_summary,
+      citations: document.citations || [],
+      validation: {
+        confidence: validation.confidence,
+        warnings: validation.warnings,
+        errors: validation.errors,
+        requires_human_review: validation.requiredHumanReview
+      },
+      pdf_url: `/api/documents/pdf/${document.document_id}`
+    });
+
     res.json({
       document_id: document.document_id,
       document: document,
       pdf_url: `/api/documents/pdf/${document.document_id}`,
-      created_at: new Date().toISOString()
+      created_at: documentRecord.created_at,
+      validation
     });
 
   } catch (error) {
@@ -75,37 +114,102 @@ router.post('/generate', async (req, res) => {
   }
 });
 
-// Get generated document as PDF
-router.get('/pdf/:documentId', async (req, res) => {
+// Validate any provided document structure
+router.post('/validate', (req: AuthRequest, res) => {
   try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { document } = req.body;
+    if (!document || typeof document !== 'object') {
+      return res.status(400).json({ error: 'document is required in request body' });
+    }
+    const validation = documentVerifier.verify(document);
+    return res.json(validation);
+  } catch (error) {
+    console.error('Document validation error:', error);
+    return res.status(500).json({ error: 'Failed to validate document' });
+  }
+});
+
+// Get user's documents
+router.get('/', async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { status, document_type, limit = 20 } = req.query as any;
+    
+    const query: any = { user_id: req.user.id };
+    if (status) query.status = status;
+    if (document_type) query.document_type = document_type;
+
+    const documents = await DocumentModel
+      .find(query)
+      .sort({ created_at: -1 })
+      .limit(parseInt(limit))
+      .lean();
+
+    res.json({
+      documents: documents.map(doc => ({
+        document_id: doc.document_id,
+        document_type: doc.document_type,
+        language: doc.language,
+        status: doc.status,
+        confidence_score: doc.confidence_score,
+        created_at: doc.created_at,
+        pdf_url: doc.pdf_url,
+        plain_language_summary: doc.plain_language_summary
+      })),
+      count: documents.length
+    });
+  } catch (error) {
+    console.error('Documents fetch error:', error);
+    res.status(500).json({ error: 'Failed to fetch documents' });
+  }
+});
+
+// Get generated document as PDF
+router.get('/pdf/:documentId', async (req: AuthRequest, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
     const { documentId } = req.params;
     
-    // In production, fetch from database
-    const sampleDocument = {
+    // Fetch document from database
+    const documentRecord = await DocumentModel.findOne({
       document_id: documentId,
-      language: 'hi',
-      jurisdiction: 'India',
-      document_type: 'sample',
-      facts: 'Sample legal document',
-      parties: {
-        petitioner: { name: 'Sample User', address: 'Sample Address' }
-      },
-      relief_sought: 'Sample relief',
-      prayer: 'Sample prayer',
-      required_docs: ['Sample documents'],
-      filing_office: {
-        name: 'Sample Office',
-        address: 'Sample Address',
-        hours: '9-5'
-      },
-      confidence_score: 0.8,
-      template_id: 'sample',
-      generated_by: 'NyaySathi',
-      timestamp: new Date().toISOString(),
-      plain_language_summary: 'This is a sample legal document.'
+      user_id: req.user.id
+    }).lean() as any;
+
+    if (!documentRecord) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    // Convert DB record to generator format
+    const document = {
+      document_id: documentRecord.document_id,
+      language: documentRecord.language,
+      jurisdiction: documentRecord.jurisdiction,
+      document_type: documentRecord.document_type,
+      facts: documentRecord.facts,
+      parties: documentRecord.parties,
+      relief_sought: documentRecord.relief_sought,
+      prayer: documentRecord.prayer,
+      required_docs: documentRecord.required_docs,
+      filing_office: documentRecord.filing_office,
+      confidence_score: documentRecord.confidence_score,
+      template_id: documentRecord.template_id,
+      generated_by: documentRecord.generated_by,
+      timestamp: documentRecord.created_at.toISOString(),
+      plain_language_summary: documentRecord.plain_language_summary
     };
 
-    const pdfBuffer = documentGenerator.generatePDF(sampleDocument);
+    const pdfBuffer = documentGenerator.generatePDF(document);
     
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="document-${documentId}.pdf"`);

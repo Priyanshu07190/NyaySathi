@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle, AlertTriangle, RefreshCw, User, Mail, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent, supportedLanguages } from '../utils/languages';
 
@@ -23,26 +24,28 @@ interface Profile {
 }
 
 export function AdminDashboard() {
+  const { user, updateProfile } = useAuth();
   const { currentLanguage, setLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
   const [sessions, setSessions] = useState<RecentSession[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string>('');
   const [profile, setProfile] = useState<Profile>({
-    name: '',
-    email: '',
-    phone: '',
-    location: '',
-    preferredLanguage: currentLanguage,
-    voiceAssist: true,
-    notifications: true
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    location: user?.address || '',
+    preferredLanguage: user?.preferences?.language || currentLanguage,
+    voiceAssist: user?.preferences?.notifications !== false,
+    notifications: user?.preferences?.notifications !== false
   });
   const [saved, setSaved] = useState(false);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      setError(null);
+      setError('');
   const res = await fetch('/api/admin/recent-sessions');
       if (!res.ok) throw new Error(content.failedToLoadSessions);
       const json = await res.json();
@@ -55,35 +58,51 @@ export function AdminDashboard() {
   };
 
   useEffect(() => {
-    // Load profile from localStorage
-    const raw = localStorage.getItem('nyaysathi_profile');
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        setProfile((p) => ({ ...p, ...parsed }));
-        if (parsed.preferredLanguage && parsed.preferredLanguage !== currentLanguage) {
-          setLanguage(parsed.preferredLanguage);
-        }
-      } catch {}
+    // Update profile when user data changes
+    if (user) {
+      setProfile({
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        location: user.address || '',
+        preferredLanguage: user.preferences?.language || currentLanguage,
+        voiceAssist: user.preferences?.notifications !== false,
+        notifications: user.preferences?.notifications !== false
+      });
     }
     loadData();
-  }, []);
+  }, [user, currentLanguage]);
 
-  // Keep profile state and localStorage in sync with global language changes
-  useEffect(() => {
-    setProfile((p) => {
-      if (p.preferredLanguage === currentLanguage) return p;
-      const next = { ...p, preferredLanguage: currentLanguage };
-      try { localStorage.setItem('nyaysathi_profile', JSON.stringify(next)); } catch {}
-      return next;
-    });
-  }, [currentLanguage]);
-
-  const handleSave = () => {
-    localStorage.setItem('nyaysathi_profile', JSON.stringify(profile));
-    setLanguage(profile.preferredLanguage);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+  const handleSave = async () => {
+    if (!user) return;
+    
+    setSaving(true);
+    setError('');
+    
+    try {
+      await updateProfile({
+        name: profile.name,
+        phone: profile.phone,
+        address: profile.location,
+        preferences: {
+          ...user.preferences,
+          language: profile.preferredLanguage,
+          notifications: profile.notifications
+        }
+      });
+      
+      // Update global language if it changed
+      if (profile.preferredLanguage !== currentLanguage) {
+        setLanguage(profile.preferredLanguage);
+      }
+      
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } catch (err: any) {
+      setError(err.message || 'Profile सेव करने में त्रुटि');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -145,16 +164,13 @@ export function AdminDashboard() {
             </div>
             <div>
               <label className="block text-sm text-gray-600 mb-1">{content.preferredLanguageLabel}</label>
-              <select
-                value={currentLanguage}
+                            <select
+                value={profile.preferredLanguage}
                 onChange={(e) => {
                   const lang = e.target.value;
-                  const next = { ...profile, preferredLanguage: lang };
-                  setProfile(next);
-                  setLanguage(lang);
-                  try { localStorage.setItem('nyaysathi_profile', JSON.stringify(next)); } catch {}
+                  setProfile({ ...profile, preferredLanguage: lang });
                 }}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {supportedLanguages.map((l) => (
                   <option key={l.code} value={l.code}>{l.nativeName}</option>
@@ -175,11 +191,20 @@ export function AdminDashboard() {
           </div>
 
           <div className="mt-6 flex items-center gap-3">
-            <button onClick={handleSave} className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">{content.saveChanges}</button>
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+            >
+              {saving ? 'सेव हो रहा है...' : content.saveChanges}
+            </button>
             {saved && (
               <span className="flex items-center text-green-600 text-sm">
                 <CheckCircle className="h-4 w-4 mr-1" /> {content.saved}
               </span>
+            )}
+            {error && (
+              <span className="text-red-600 text-sm">{error}</span>
             )}
           </div>
         </div>
