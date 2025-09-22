@@ -8,36 +8,69 @@ router.post('/send', async (req, res) => {
   try {
     const { message, language = 'hi', session_id = 'default' } = req.body;
     
-    // Use OpenRouter for AI response
-    let aiResponse = "Thank you for your legal query. I understand you need assistance. How can I help you further?";
-    let suggestions = [
-      "Tell me more about your situation",
-      "Do you have any documents related to this case?", 
-      "Would you like me to help draft a legal document?"
-    ];
+    // Validate input
+    if (!message || message.trim().length === 0) {
+      return res.status(400).json({ 
+        error: 'Message is required',
+        message: language === 'hi' ? 'कृपया अपना संदेश लिखें।' : 'Please enter your message.'
+      });
+    }
+    
+    console.log(`📩 Conversation request - Language: ${language}, Message: ${message.substring(0, 50)}...`);
+    
+    // Default fallback responses
+    let aiResponse = language === 'hi' 
+      ? "धन्यवाद। मैं आपकी कानूनी समस्या को समझने की कोशिश कर रहा हूँ। कृपया और विवरण बताएं।"
+      : "Thank you for your legal query. I understand you need assistance. Please provide more details.";
+    
+    let suggestions = language === 'hi' 
+      ? [
+          "अपनी समस्या के बारे में और बताएं",
+          "दस्तावेज़ बनवाना चाहते हैं?", 
+          "एनजीओ से संपर्क करें"
+        ]
+      : [
+          "Tell me more about your situation",
+          "Do you want to generate a document?", 
+          "Connect with an NGO"
+        ];
     
     try {
-      // Try to get AI response if API key is available
-      const response = await openRouter.conversationResponse(message, language);
-      if (response) {
-        aiResponse = response.message || aiResponse;
-        suggestions = response.suggestions || suggestions;
+      // Try to get AI response
+      console.log('🤖 Attempting to get AI response...');
+      const aiResult = await openRouter.conversationResponse(message, language);
+      
+      if (aiResult && aiResult.message) {
+        aiResponse = aiResult.message;
+        suggestions = aiResult.suggestions || suggestions;
+        console.log('✅ AI response received successfully');
+      } else {
+        console.log('⚠️ AI response was empty, using fallback');
       }
     } catch (aiError) {
-      console.log('AI service unavailable, using fallback response');
+      console.log('❌ AI service error:', aiError instanceof Error ? aiError.message : 'Unknown error');
+      console.log('Using intelligent fallback response...');
     }
     
     const response = {
       session_id,
       message: aiResponse,
       suggestions,
-      language
+      language,
+      timestamp: new Date().toISOString()
     };
     
+    console.log('📤 Sending response:', response.message.substring(0, 100) + '...');
     res.json(response);
+    
   } catch (error) {
-    console.error('Conversation error:', error);
-    res.status(500).json({ error: 'Failed to process conversation' });
+    console.error('❌ Conversation route error:', error);
+    res.status(500).json({ 
+      error: 'Failed to process conversation',
+      message: req.body?.language === 'hi' 
+        ? 'माफ करें, कुछ समस्या हुई है। कृपया दोबारा कोशिश करें।'
+        : 'Sorry, something went wrong. Please try again.'
+    });
   }
 });
 

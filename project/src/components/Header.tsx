@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Scale, Home as HomeIcon, MessageCircle, Users, Settings, LogOut, User, Globe } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguageStore } from '../store/languageStore';
-import { getLanguageContent } from '../utils/languages';
+import { getLanguageContent, languageNames } from '../utils/languages';
 
 export function Header() {
   const location = useLocation();
@@ -85,13 +85,11 @@ export function Header() {
                 onChange={(e) => handleLanguageChange(e.target.value)}
                 className="appearance-none bg-gray-50 border border-gray-200 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="hi">हिंदी</option>
-                <option value="en">English</option>
-                <option value="ta">தமிழ்</option>
-                <option value="te">తెలుగు</option>
-                <option value="kn">ಕನ್ನಡ</option>
-                <option value="bn">বাংলা</option>
-                <option value="gu">ગુજરાતી</option>
+                {Object.entries(languageNames).map(([code, name]) => (
+                  <option key={code} value={code}>
+                    {name}
+                  </option>
+                ))}
               </select>
               <Globe className="absolute right-2 top-1/2 transform -translate-y-1/2 h-3 w-3 text-gray-400 pointer-events-none" />
             </div>

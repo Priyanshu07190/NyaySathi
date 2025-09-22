@@ -134,10 +134,14 @@ export function NGODirectory() {
               onChange={(e) => handleSearchChange('language', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="hi">Hindi</option>
-              <option value="en">English</option>
-              <option value="ta">Tamil</option>
-              <option value="te">Telugu</option>
+              <option value="">All Languages</option>
+              <option value="hi">हिंदी (Hindi)</option>
+              <option value="en">English (अंग्रेजी)</option>
+              <option value="ta">தமிழ் (Tamil)</option>
+              <option value="te">తెలుగు (Telugu)</option>
+              <option value="kn">ಕನ್ನಡ (Kannada)</option>
+              <option value="bn">বাংলা (Bengali)</option>
+              <option value="gu">ગુજરાતી (Gujarati)</option>
             </select>
           </div>
         </div>

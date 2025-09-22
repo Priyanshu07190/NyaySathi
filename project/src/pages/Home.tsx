@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MessageCircle, FileText, Users, Shield, Mic, Globe, ArrowRight } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
-import { getLanguageContent, languages } from '../utils/languages';
+import { getLanguageContent, languages, languageNames } from '../utils/languages';
 
 export function Home() {
   const { currentLanguage } = useLanguageStore();
@@ -27,19 +27,7 @@ export function Home() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Hero Section */}
       <div className="text-center mb-16">
-        <div className="mb-8 relative">
-          {/* Language Selector */}
-          <div className="absolute right-0 -top-4 flex flex-col sm:flex-row gap-2 items-end sm:items-center">
-            <select
-              value={currentLanguage}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="bg-white/80 backdrop-blur px-3 py-2 text-sm border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {Object.keys(languages).slice(0,8).map(code => (
-                <option key={code} value={code}>{code.toUpperCase()}</option>
-              ))}
-            </select>
-          </div>
+        <div className="mb-8">
           <h1 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">{content.welcomeTitle}</h1>
           <p className="text-xl text-gray-600 mb-2">{content.welcomeSubtitle}</p>
           <p className="text-lg text-gray-500">{content.welcomeDescription}</p>

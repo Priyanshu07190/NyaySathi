@@ -219,6 +219,17 @@ export interface LanguageContent {
   tableCreated: string;
 }
 
+// Language display names
+export const languageNames: Record<string, string> = {
+  hi: "हिंदी (Hindi)",
+  en: "English (अंग्रेजी)",
+  ta: "தமிழ் (Tamil)",
+  te: "తెలుగు (Telugu)", 
+  kn: "ಕನ್ನಡ (Kannada)",
+  bn: "বাংলা (Bengali)",
+  gu: "ગુજરાતી (Gujarati)"
+};
+
 export const languages: Record<string, Partial<LanguageContent>> = {
   hi: {
     // Header
@@ -1776,11 +1787,11 @@ export function getLanguageContent(languageCode: string): LanguageContent {
 }
 
 export const supportedLanguages = [
-  { code: 'hi', name: 'हिंदी', nativeName: 'हिंदी' },
-  { code: 'en', name: 'English', nativeName: 'English' },
-  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ்' },
-  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు' },
-  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ' },
-  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা' },
-  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી' }
+  { code: 'hi', name: 'Hindi', nativeName: 'हिंदी (Hindi)' },
+  { code: 'en', name: 'English', nativeName: 'English (अंग्रेजी)' },
+  { code: 'ta', name: 'Tamil', nativeName: 'தமிழ் (Tamil)' },
+  { code: 'te', name: 'Telugu', nativeName: 'తెలుగు (Telugu)' },
+  { code: 'kn', name: 'Kannada', nativeName: 'ಕನ್ನಡ (Kannada)' },
+  { code: 'bn', name: 'Bengali', nativeName: 'বাংলা (Bengali)' },
+  { code: 'gu', name: 'Gujarati', nativeName: 'ગુજરાતી (Gujarati)' }
 ];

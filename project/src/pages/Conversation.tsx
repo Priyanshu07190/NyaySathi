@@ -3,10 +3,12 @@ import { Mic, MicOff, Send, FileText, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent } from '../utils/languages';
 import { useVoice } from '../hooks/useVoice';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Conversation() {
   const { currentLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
+  const { token } = useAuth();
   const [messages, setMessages] = useState<Array<{id: number, text: string, isUser: boolean}>>([]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -42,10 +44,11 @@ export function Conversation() {
     
     try {
       // Call backend API
-      const response = await fetch('http://localhost:3001/api/conversation/send', {
+      const response = await fetch('/api/conversation/send', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           message: inputText,
@@ -97,6 +100,15 @@ export function Conversation() {
   const toggleSpeaking = () => {
     if (isSpeaking) {
       stopSpeaking();
+    } else {
+      // Find the last AI message and speak it again
+      const lastAiMessage = messages
+        .filter(m => !m.isUser)
+        .pop();
+      
+      if (lastAiMessage) {
+        speak(lastAiMessage.text);
+      }
     }
   };
 
@@ -106,10 +118,11 @@ export function Conversation() {
       // Extract facts from conversation history
       const userMessages = messages.filter(m => m.isUser).map(m => m.text).join('. ');
       
-      const response = await fetch('http://localhost:3001/api/documents/generate', {
+      const response = await fetch('/api/documents/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           facts: userMessages,

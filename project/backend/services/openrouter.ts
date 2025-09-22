@@ -189,10 +189,34 @@ Always ask clarifying questions to better understand the user's situation.`;
   }
 
   private getMockConversationResponse(message: string, language: string) {
+    // Create contextual responses based on user input
+    const lowerMessage = message.toLowerCase();
+    let response = '';
+    
+    if (language === 'hi') {
+      if (lowerMessage.includes('वेतन') || lowerMessage.includes('तनख्वाह') || lowerMessage.includes('salary') || lowerMessage.includes('wage')) {
+        response = 'मैं समझ गया कि आपकी वेतन से संबंधित समस्या है। क्या आपका मालिक समय पर वेतन नहीं दे रहा है? कृपया अधिक विवरण बताएं जैसे कि कितने महीने से वेतन रुका है और आपका काम क्या है।';
+      } else if (lowerMessage.includes('rti') || lowerMessage.includes('जानकारी')) {
+        response = 'आप RTI आवेदन के बारे में पूछ रहे हैं। यह बहुत अच्छी बात है। RTI के तहत आप सरकारी जानकारी मांग सकते हैं। आपको किस विषय में जानकारी चाहिए?';
+      } else if (lowerMessage.includes('किराया') || lowerMessage.includes('मकान') || lowerMessage.includes('घर')) {
+        response = 'आपकी घर या किराये से जुड़ी समस्या है। क्या मकान मालिक परेशान कर रहा है या किराया बढ़ाने की बात कह रहा है? अपनी स्थिति के बारे में बताएं।';
+      } else {
+        response = 'नमस्कार! मैं NyaySathi हूँ, आपका AI कानूनी सहायक। आपकी कानूनी समस्या क्या है? मैं आपकी मदद करने के लिए यहाँ हूँ।';
+      }
+    } else {
+      if (lowerMessage.includes('salary') || lowerMessage.includes('wage') || lowerMessage.includes('payment')) {
+        response = 'I understand you have a salary or wage-related issue. Is your employer not paying you on time? Please provide more details like how many months salary is pending and what type of work you do.';
+      } else if (lowerMessage.includes('rti') || lowerMessage.includes('information')) {
+        response = 'You are asking about RTI application. That\'s great! Under RTI, you can request government information. What subject do you need information about?';
+      } else if (lowerMessage.includes('rent') || lowerMessage.includes('house') || lowerMessage.includes('landlord')) {
+        response = 'You have a housing or rental issue. Is your landlord troubling you or asking to increase rent? Please tell me about your situation.';
+      } else {
+        response = 'Hello! I am NyaySathi, your AI legal assistant. What is your legal problem? I am here to help you.';
+      }
+    }
+    
     return {
-      response: language === 'hi' 
-        ? 'मैं NyaySathi हूँ। वर्तमान में मैं डेमो मोड में हूँ। पूर्ण AI सुविधाओं के लिए OpenRouter API key की आवश्यकता है। कृपया अपनी कानूनी समस्या बताएं।'
-        : 'I am NyaySathi. Currently in demo mode. Full AI features require OpenRouter API key. Please describe your legal issue.',
+      message: response,
       suggestions: [
         language === 'hi' ? 'वेतन की समस्या' : 'Salary Issues',
         language === 'hi' ? 'संपत्ति विवाद' : 'Property Dispute', 
