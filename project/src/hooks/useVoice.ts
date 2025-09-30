@@ -25,7 +25,6 @@ export const useVoice = ({ language, onTranscript }: VoiceHookProps) => {
   const [isSupported, setIsSupported] = useState(true);
   
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const synthesisRef = useRef<SpeechSynthesis | null>(null);
 
   // Initialize speech recognition
   const initializeRecognition = useCallback(() => {

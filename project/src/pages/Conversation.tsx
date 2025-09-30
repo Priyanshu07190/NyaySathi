@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Mic, MicOff, Send, FileText, Volume2, VolumeX } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
 import { getLanguageContent } from '../utils/languages';

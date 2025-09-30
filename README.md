@@ -1,7 +1,8 @@
-# 🏛️ NyaySathi - Your AI Legal Assistant
-
 <div align="center">
 
+# 🏛️ NyaySathi - Your AI Legal Assistant
+
+![NyaySathi Logo](https://via.placeholder.com/200x100/4F46E5/FFFFFF?text=NyaySathi)
 
 **Empowering Citizens with AI-Powered Legal Assistance**
 

@@ -1,13 +1,11 @@
 import { Link } from 'react-router-dom';
 import { MessageCircle, FileText, Users, Shield, Mic, Globe, ArrowRight } from 'lucide-react';
 import { useLanguageStore } from '../store/languageStore';
-import { getLanguageContent, languages, languageNames } from '../utils/languages';
+import { getLanguageContent, languages } from '../utils/languages';
 
 export function Home() {
   const { currentLanguage } = useLanguageStore();
   const content = getLanguageContent(currentLanguage);
-
-  const { setLanguage } = useLanguageStore();
 
   const features = [
     { icon: Mic, title: content.voiceFirst, description: content.voiceFirstDesc, descriptionEn: 'Voice-first interface' },
